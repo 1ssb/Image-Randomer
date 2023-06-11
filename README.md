@@ -1,11 +1,5 @@
 # Image Randomiser: A Method to optimize samples using a downsampling and Langevin annealing using JS Divergence.
 
-# Function is GPU optimized so as to make sure that the operations are well optimized.
-
-# Code by 1ssb.
-
-# Image Processing with Langevin Dynamics
-
 This repository contains a Python script that uses Langevin dynamics to process a set of images and save a sample of the optimal images to a destination directory.
 
 ## Overview

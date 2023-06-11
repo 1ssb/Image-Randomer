@@ -1,4 +1,4 @@
-# Image_Randomer: A Method to optimize samples using a CNN and Langevin annealing using 5 different statistical measures.
+# Image Randomer: A Method to optimize samples using a CNN and Langevin annealing using 5 different statistical measures.
 
 # Function is GPU optimized so as to make sure that the operations are well optimized.
 

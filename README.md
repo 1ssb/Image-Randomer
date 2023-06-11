@@ -18,6 +18,8 @@ After iterating over all possible samples, the function copies the best sample f
 
 This code provides an example of how to use several different libraries and techniques, including CNNs, Langevin dynamics, and various statistical measures, to create a distribution of images that is statistically similar to a given source distribution of images. For more information on these topics, you can refer to their respective Wikipedia pages or research papers.
 
-#References
+#   References
 
-https://en.wikipedia.org/wiki/Convolutional_neural_network : https://en.wikipedia.org/wiki/Langevin_dynamics : https://en.wikipedia.org/wiki/Statistical_distance
+1. https://en.wikipedia.org/wiki/Convolutional_neural_network 
+2. https://en.wikipedia.org/wiki/Langevin_dynamics 
+3. https://en.wikipedia.org/wiki/Statistical_distance

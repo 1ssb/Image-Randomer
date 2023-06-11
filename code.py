@@ -1,173 +1,75 @@
 #!/usr/bin/env python3
-
-# Standalone code by 1ssb
-
-# Image_Randomer
-
+# code by 1ssb: https://github.com/1ssb/Image-Randomizer
 
 import os
-import shutil
 from PIL import Image
-import numpy as np
 import torch
-from torch import nn
+from torchvision import transforms
+from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-from scipy.stats import ks_2samp
 
-# Check if the required packages are installed and install them if necessary
-try:
-    from scipy.spatial.distance import cdist, jensenshannon
-except ImportError:
-    import subprocess
-    subprocess.check_call(["python3", '-m', 'pip', 'install', 'scipy'])
-    from scipy.spatial.distance import cdist, jensenshannon
+def process_images(source_path, destination_path, sample_size):
+    if not torch.cuda.is_available():
+        raise Exception('GPU is not available')
+    device = torch.device('cuda')
 
-try:
-    from pytorch_fid import fid_score
-except ImportError:
-    import subprocess
-    subprocess.check_call(["python3", '-m', 'pip', 'install', 'pytorch-fid'])
-    from pytorch_fid import fid_score
+    class ImageDataset(Dataset):
+        def __init__(self, root_dir, transform=None):
+            self.root_dir = root_dir
+            self.transform = transform
+            self.image_paths = [os.path.join(root_dir, f) for f in os.listdir(root_dir) if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg')]
+        def __len__(self):
+            return len(self.image_paths)
+        def __getitem__(self, idx):
+            image_path = self.image_paths[idx]
+            image = Image.open(image_path).convert('RGB')
+            if self.transform:
+                image = self.transform(image)
+            return image
 
-print("All libraries successfully imported")
+    def loss_fn(sample_distribution, source_distribution):
+        m = 0.5 * (sample_distribution + source_distribution)
+        js_distance = 0.5 * (torch.sum(sample_distribution * torch.log(sample_distribution / m)) + torch.sum(source_distribution * torch.log(source_distribution / m)))
+        return js_distance
 
-# Placeholder variables
-src_path = "/path/to/images"
-dst_path = "/path/to/sample"
-target_number = 200
-importance_values = [1, 1, 1, 1, 1]
+    def add_noise(image, level):
+        noise = torch.randn_like(image) * level
+        image = image + noise
+        return image
 
-#    Importance value rules are:
-#    w1 = mahalanobis_distance_importance   
-#    w2 = js_divergence_importance
-#    w3 = fid_score_value_importance
-#    w4 = kl_divergence_importance
-#    w5 = ks_distance_importance
+    transform = transforms.Compose([transforms.Resize(64), transforms.ToTensor()])
+    dataset = ImageDataset(source_path, transform=transform)
 
-def create_image_distribution(src_path, target_number, dst_path, importance_values):
-    # Read images from the src_path
-    images = []
-    filenames = []
-    for filename in os.listdir(src_path):
-        if filename.endswith(".jpg") or filename.endswith(".png"):
-            img = Image.open(os.path.join(src_path, filename))
-            images.append(np.array(img))
-            filenames.append(filename)
-    
-    # Check if the source number is at least 3 times the target number
-    if len(images) < 3 * target_number:
-        raise ValueError("The source number must be at least 3 times the target number")
-    
-    # Convert the list of images to a numpy array and move it to the GPU
-    images = torch.tensor(images).to('cuda')
-    
-    # Calculate the mean and standard deviation of the pixel values
-    mean = torch.mean(images, axis=(0,1,2))
-    std = torch.std(images, axis=(0,1,2))
-    
-    # Create a normal distribution using the calculated mean and standard deviation
-    distribution = torch.normal(mean=mean, std=std, size=images.shape)
-    
-    # Initialize the minimum distance and best sample
-    min_distance = float("inf")
-    best_sample = None
-    
-    # Define a basic CNN model for downsampling the images (using float32 to reduce memory usage)
-    class DownsampleCNN(nn.Module):
-        def __init__(self):
-            super(DownsampleCNN, self).__init__()
-            self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1)
-            self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
-            self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
-        
-        def forward(self, x):
-            x = x.float()
-            x = self.conv1(x)
-            x = nn.functional.relu(x)
-            x = self.conv2(x)
-            x = nn.functional.relu(x)
-            x = self.conv3(x)
-            x = nn.functional.relu(x)
-            return x
-    
-    # Move the CNN model to the GPU and set it to evaluation mode (to disable dropout and batch normalization)
-    cnn_model = DownsampleCNN().to('cuda')
-    cnn_model.eval()
-    
-    # Iterate len(images) times with a progress bar over the entire operation
-    with tqdm(total=len(images)) as pbar:
-        for i in range(len(images)):
-            # Randomly select target_number images
-            sample_indices = torch.randperm(len(images))[:target_number]
-            sample_images = images[sample_indices]
-            
-            # Downsample the images using the CNN model (using float32 to reduce memory usage)
-            sample_images_downsampled = cnn_model(sample_images.permute(0,3,1,2)).permute(0,2,3,1)
-            
-            # Simulate Langevin dynamics to add noise to the downsampled images before calculating statistical distances
-            dt = 0.1  # Time step size for Langevin dynamics simulation
-            gamma = 1.0  # Friction coefficient for Langevin dynamics simulation
-            kT = 1.0  # Temperature for Langevin dynamics simulation (kT is Boltzmann constant times temperature)
-            
-            sample_images_downsampled += -gamma * sample_images_downsampled * dt + np.sqrt(2 * gamma * kT * dt) * torch.randn_like(sample_images_downsampled)
-            
-            # Calculate the mean and standard deviation of the sample pixel values (using float32 to reduce memory usage)
-            sample_mean = torch.mean(sample_images_downsampled.float(), axis=(0,1,2))
-            sample_std = torch.std(sample_images_downsampled.float(), axis=(0,1,2))
-            
-            # Create a normal distribution for the sample using the calculated mean and standard deviation (using float32 to reduce memory usage)
-            sample_distribution = torch.normal(mean=sample_mean.float(), std=sample_std.float(), size=sample_images_downsampled.shape)
-            
-            # Calculate the Mahalanobis distance between the two distributions (using NumPy)
-            mahalanobis_distance = cdist(distribution.cpu().numpy().reshape(1,-1), sample_distribution.cpu().numpy().reshape(1,-1), metric='mahalanobis')[0][0]
-            
-            # Calculate the Jensen-Shannon divergence between the two distributions (using SciPy)
-            js_divergence = jensenshannon(distribution.cpu().numpy().flatten(), sample_distribution.cpu().numpy().flatten())
-            
-            # Calculate the FID score between the two distributions (using pytorch-fid)
-            mu1, sigma1 = fid_score.calculate_activation_statistics(distribution.cpu().numpy().reshape(target_number,-1), model=None)
-            mu2, sigma2 = fid_score.calculate_activation_statistics(sample_distribution.cpu().numpy().reshape(target_number,-1), model=None)
-            fid_score_value = fid_score.calculate_frechet_distance(mu1, sigma1, mu2, sigma2)
-            
-            # Calculate the KL divergence between the two distributions (using PyTorch)
-            kl_divergence = torch.nn.functional.kl_div(torch.log_softmax(distribution.flatten(), dim=0), torch.softmax(sample_distribution.flatten(), dim=0))
-            
-            # Calculate the Kolmogorov-Smirnov distance between the two distributions (using SciPy)
-            ks_distance = ks_2samp(distribution.cpu().numpy().flatten(), sample_distribution.cpu().numpy().flatten()).statistic
-            
-            # Assign placeholder values for the importance of the statistical parameters
-            mahalanobis_distance_importance = importance_values[0]
-            js_divergence_importance = importance_values[1]
-            fid_score_value_importance = importance_values[2]
-            kl_divergence_importance = importance_values[3]
-            ks_distance_importance = importance_values[4]
-            
-            # Calculate the weights as the normalized importance values
-            w1 = mahalanobis_distance_importance / sum(importance_values)
-            w2 = js_divergence_importance / sum(importance_values)
-            w3 = fid_score_value_importance / sum(importance_values)
-            w4 = kl_divergence_importance / sum(importance_values)
-            w5 = ks_distance_importance / sum(importance_values)
-            
-            # Calculate the total loss as a weighted sum of the individual loss values
-            total_loss = w1 * mahalanobis_distance + w2 * js_divergence + w3 * fid_score_value + w4 * kl_divergence + w5 * ks_distance
-            
-            # Update the minimum distance and best sample if necessary
-            if total_loss < min_distance:
-                min_distance = total_loss
-                best_sample = sample_indices
-            
-            # Update the progress bar
-            pbar.update(1)
-    
-    # Copy the best sample images to the dst_path (if it doesn't already exist)
-    if not os.path.exists(dst_path):
-        os.makedirs(dst_path)
-    
-    for i in best_sample:
-        shutil.copy(os.path.join(src_path, filenames[i]), os.path.join(dst_path, filenames[i]))
-    
-    return distribution
+    if len(dataset) < 3 * sample_size:
+        raise Exception('The number of images in the source directory must be at least 3 times larger than the sample size')
 
-# Example usage
-distribution = create_image_distribution(src_path, target_number, dst_path, importance_values)
+    dataloader = DataLoader(dataset, batch_size=1)
+    os.makedirs(destination_path, exist_ok=True)
+    optimal_image_names = []
+
+    for i, image in enumerate(tqdm(dataloader)):
+        image = image.to(device)
+        source_distribution = image.flatten()
+        sample_distribution = torch.randn_like(image).to(device)
+        sample_distribution.requires_grad_(True)
+        optimizer = torch.optim.AdamW([sample_distribution], lr=0.1)
+
+        for j in range(50):
+            for level in [0.1, 0.01, 0.001]:
+                noisy_image = add_noise(image, level)
+                sample_distribution.data = noisy_image.flatten()
+                loss = loss_fn(sample_distribution, source_distribution)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+        optimal_image_names.append(dataset.image_paths[i])
+
+    for optimal_image_name in optimal_image_names[:sample_size]:
+        original_image_name = os.path.basename(optimal_image_name)
+        os.rename(optimal_image_name, os.path.join(destination_path, original_image_name))
+
+source_path = 'source'
+destination_path = 'dest'
+sample_size = #No
+process_images(source_path, destination_path, sample_size)

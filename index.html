@@ -16,6 +16,12 @@
 
 <p>The motivation behind using the JS divergence is that it is a bounded measure of similarity, meaning that its value always lies between 0 and 1. This makes it easier to interpret and compare the results. Additionally, unlike the KL divergence, the JS divergence is symmetric, meaning that it gives the same result regardless of the order in which the two distributions are compared.</p>
 
+<h2>Langevin Dynamics</h2>
+
+<p>Langevin dynamics is a mathematical framework used to model the movement of particles in a fluid. It is based on the idea of adding random noise to the motion of particles to simulate the effects of thermal fluctuations.</p>
+
+<p>In this script, Langevin dynamics is used to add noise to the images during the evaluation process. This allows the optimization algorithm to explore different regions of the solution space and avoid getting stuck in local minima. The noise is added at multiple levels using an annealing schedule, which gradually reduces the amount of noise as the optimization progresses.</p>
+
 <h2>Usage</h2>
 
 <p>To use the script, you need to specify the source and destination directories and the sample size as arguments to the `process_images` function. The source directory should contain the images you want to process, and the destination directory is where the resulting images will be saved. The sample size determines how many of the optimal images will be saved to the destination directory.</p>

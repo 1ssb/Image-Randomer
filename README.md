@@ -2,6 +2,8 @@
 
 This repository contains a Python script that uses Langevin dynamics to process a set of images and save a sample of the optimal images to a destination directory.
 
+PYTHON CODE: https://github.com/1ssb/Image-Randomiser/blob/main/code.py
+
 ## Overview
 
 The script loads a set of images from a source directory and downsamples them to speed up computation. It then adds noise to the images during the evaluation process using Langevin dynamics and remembers the names of the optimal images in the sample distribution. After the evaluation process has completed, it copies only those images from the source to the destination directory.

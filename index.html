@@ -1,38 +1,71 @@
-<h1>Image Randomiser: A Method to optimize samples using a downsampling and Langevin annealing using JS Divergence.</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Randomiser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #F5F5DC;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #333;
+        }
+        h1, h2 {
+            margin-top: 30px;
+        }
+        .footer {
+            padding: 10px;
+            text-align: center;
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Image Randomiser: A Method to Optimize Samples Using Downsampling and Langevin Annealing with JS Divergence</h1>
 
-<p>This repository contains a Python script that uses Langevin dynamics to process a set of images and save a sample of the optimal images to a destination directory.</p>
+        <p>This repository contains a Python script that employs Langevin dynamics to process a set of images and save a sample of the optimal images to a specified destination directory.</p>
 
-<p>PYTHON CODE: <a href="https://github.com/1ssb/Image-Randomiser/blob/main/code.py">https://github.com/1ssb/Image-Randomiser/blob/main/code.py</a></p>
+        <p>Python Code: <a href="https://github.com/1ssb/Image-Randomiser/blob/main/code.py">https://github.com/1ssb/Image-Randomiser/blob/main/code.py</a></p>
 
-<h2>Overview</h2>
+        <h2>Overview</h2>
 
-<p>The script loads a set of images from a source directory and downsamples them to speed up computation. It then adds noise to the images during the evaluation process using Langevin dynamics and remembers the names of the optimal images in the sample distribution. After the evaluation process has completed, it copies only those images from the source to the destination directory.</p>
+        <p>The script loads a set of images from a source directory and downsamples them to expedite computation. During the evaluation process, it adds noise to the images using Langevin dynamics and retains the names of the optimal images in the sample distribution. Upon completion of the evaluation process, it copies only those images from the source to the destination directory.</p>
 
-<p>The code uses PyTorch to implement the image processing pipeline and can use multiple GPUs for acceleration if they are available.</p>
+        <p>The code employs PyTorch to implement the image processing pipeline and can utilize multiple GPUs for acceleration if available.</p>
 
-<h2>Jensen-Shannon Divergence</h2>
+        <h2>Jensen-Shannon Divergence</h2>
 
-<p>The script uses the Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed version of the Kullback-Leibler (KL) divergence, which measures how different two probability distributions are.</p>
+        <p>The script utilizes Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed variant of the Kullback-Leibler (KL) divergence, which measures the dissimilarity between two probability distributions.</p>
 
-<p>The motivation behind using the JS divergence is that it is a bounded measure of similarity, meaning that its value always lies between 0 and 1. This makes it easier to interpret and compare the results. Additionally, unlike the KL divergence, the JS divergence is symmetric, meaning that it gives the same result regardless of the order in which the two distributions are compared.</p>
+        <p>The rationale for using JS divergence is that it is a bounded measure of similarity; its value always lies between 0 and 1. This makes it easier to interpret and compare results. Additionally, unlike KL divergence, JS divergence is symmetric; it yields the same result irrespective of the order in which the two distributions are compared.</p>
 
-<h2>Langevin Dynamics</h2>
+        <h2>Langevin Dynamics</h2>
 
-<p>Langevin dynamics is a mathematical framework used to model the movement of particles in a fluid. It is based on the idea of adding random noise to the motion of particles to simulate the effects of thermal fluctuations.</p>
+        <p>Langevin dynamics is a mathematical framework employed to model particle movement in a fluid. It is predicated on adding random noise to particle motion to simulate thermal fluctuations' effects.</p>
 
-<p>In this script, Langevin dynamics is used to add noise to the images during the evaluation process. This allows the optimization algorithm to explore different regions of the solution space and avoid getting stuck in local minima. The noise is added at multiple levels using an annealing schedule, which gradually reduces the amount of noise as the optimization progresses.</p>
+        <p>In this script, Langevin dynamics is used to add noise to images during the evaluation process. This enables the optimization algorithm to explore different solution space regions and avoid getting trapped in local minima. The noise is added at multiple levels using an annealing schedule that gradually reduces noise as optimization progresses.</p>
 
-<h2>Usage</h2>
+        <h2>Usage</h2>
 
-<p>To use the script, you need to specify the source and destination directories and the sample size as arguments to the `process_images` function. The source directory should contain the images you want to process, and the destination directory is where the resulting images will be saved. The sample size determines how many of the optimal images will be saved to the destination directory.</p>
+        <p>To use this script, you must specify source and destination directories and sample size as arguments to the `process_images` function. The source directory should contain images you wish to process, while the destination directory is where resulting images will be saved. The sample size determines how many optimal images will be saved to the destination directory.</p>
 
-<p>CHECK OUT THE CODE AND MAIL ME IF SOMETHING MESSES UP at <a href="mailto:Subhransu.Bhattacharjee@anu.edu.au">Subhransu.Bhattacharjee@anu.edu.au</a></p>
+        <p>Check out the code and email me at <a href="mailto:Subhransu.Bhattacharjee@anu.edu.au">Subhransu.Bhattacharjee@anu.edu.au</a> if you encounter any issues.</p>
 
-<h1>References</h1>
+        <h1>References</h1>
 
-<ol>
-    <li>Welling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient Langevin dynamics. In Proceedings of the 28th International Conference on Machine Learning (ICML-11) (pp. 681-688).</li>
-    <li>Li, C., Zhu, J., & Zhang, B. (2018). Learning energy-based models with exponential family Langevin dynamics. arXiv preprint arXiv:1811.12359.</li>
-    <li>Pascanu, R., & Bengio, Y. (2014). Revisiting natural gradient for deep networks. arXiv preprint arXiv:1301.3584.</li>
-    <li>Lin, J. (1991). Divergence measures based on the Shannon entropy. IEEE Transactions on Information Theory, 37(1), 145-151.</li>
-</ol>
+        <ol>
+            <li>Welling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient Langevin dynamics. In Proceedings of the 28th International Conference on Machine Learning (ICML-11) (pp. 681-688).</li>
+            <li>Li, C., Zhu, J., & Zhang, B. (2018). Learning energy-based models with exponential family Langevin dynamics. arXiv preprint arXiv:1811.12359.</li>
+            <li>Pascanu, R., & Bengio, Y. (2014). Revisiting natural gradient for deep networks. arXiv preprint arXiv:1301.3584.</li>
+            <li>Lin, J. (1991). Divergence measures based on the Shannon entropy. IEEE Transactions on Information Theory, 37(1), 145-151.</li>
+        </ol>
+    </div>
+    <div class="footer">
+        <p>© 2023 Subhransu S. Bhattacharjee</p>
+    </div>
+</body>
+</html>

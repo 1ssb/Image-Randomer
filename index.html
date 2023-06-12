@@ -21,9 +21,82 @@
             text-align: center;
             border-top: 1px solid #333;
         }
+        .overview {
+            display: flex;
+        }
+        .overview img {
+            max-width: 50%;
+            height: auto;
+            margin-left: 20px;
+        }
+        .switch {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          display: inline-block;
+          width: 60px;
+          height: 34px;
+        }
+
+        .switch input { 
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc;
+          -webkit-transition: .4s;
+          transition: .4s;
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 26px;
+          width: 26px;
+          left: 4px;
+          bottom: 4px;
+          background-color: white;
+          -webkit-transition: .4s;
+          transition: .4s;
+        }
+
+        input:checked + .slider {
+          background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+          box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+          -webkit-transform: translateX(26px);
+          -ms-transform: translateX(26px);
+          transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+          border-radius: 34px;
+        }
+
+        .slider.round:before {
+          border-radius: 50%;
+        }
     </style>
 </head>
 <body>
+    <label class="switch">
+      <input type="checkbox" id="theme-switch">
+      <span class="slider round"></span>
+    </label>
     <div class="content">
         <h1>Image Randomiser: A Method to Optimize Samples by Downsampling and Langevin Annealing using JS Divergence</h1>
 
@@ -31,12 +104,18 @@
 
         <p>Python Code: <a href="https://github.com/1ssb/Image-Randomiser/blob/main/code.py">https://github.com/1ssb/Image-Randomiser/blob/main/code.py</a></p>
 
-        <h2>Overview</h2>
-
+    <h2>Overview</h2>
+        <div class="overview">
+        <div>
         <p>The script loads a set of images from a source directory and downsamples them to expedite computation. During the evaluation process, it adds noise to the images using Langevin dynamics and retains the names of the optimal images in the sample distribution. Upon completion of the evaluation process, it copies only those images from the source to the destination directory.</p>
-
         <p>The code employs PyTorch to implement the image processing pipeline and can utilize multiple GPUs for acceleration if available.</p>
-
+        </div>
+    <figure>
+    <img src="image_placeholder.png" alt="Image Placeholder">
+    <figcaption>Algorithm's overview</figcaption>
+    </figure>
+        </div> 
+        
         <h2>Jensen-Shannon Divergence</h2>
 
         <p>The script utilizes Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed variant of the Kullback-Leibler (KL) divergence, which measures the dissimilarity between two probability distributions.</p>

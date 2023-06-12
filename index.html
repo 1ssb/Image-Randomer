@@ -3,6 +3,10 @@
 <head>
     <title>Image Randomiser</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name='description' content='A Method to Optimize Samples by Downsampling and Langevin Annealing using JS Divergence'/>
+	<meta name="author" content="Subhransu S. Bhattacharjee">
+	<meta charset="utf-8" />
+	<html lang='en-gb'>
     <style>
         body {
             background-color: #F5F5DC;
@@ -21,14 +25,6 @@
             text-align: center;
             border-top: 1px solid #333;
         }
-        .overview {
-            display: flex;
-        }
-        .overview img {
-            max-width: 100%;
-            height: auto;
-            margin-left: 20px;
-        }
             </style>
 </head>
 <body>
@@ -40,17 +36,16 @@
         <p>Python Code: <a href="https://github.com/1ssb/Image-Randomiser/blob/main/code.py">https://github.com/1ssb/Image-Randomiser/blob/main/code.py</a></p>
 
     <h2>Overview</h2>
-        <div class="overview">
         <div>
         <p>The script loads a set of images from a source directory and downsamples them to expedite computation. During the evaluation process, it adds noise to the images using Langevin dynamics and retains the names of the optimal images in the sample distribution. Upon completion of the evaluation process, it copies only those images from the source to the destination directory.</p>
         <p>The code employs PyTorch to implement the image processing pipeline and can utilize multiple GPUs for acceleration if available.</p>
         </div>
-    <figure>
-    <img src="algo.png" alt="Image Placeholder">
-    <figcaption> Algorithm's overview </figcaption>
-    </figure>
-        </div> 
-        
+    <div>
+<figure style="text-align: center;">
+    <img src="algo.png" alt="Algorithm's overview" style="max-width: 100%;">
+    <figcaption>Algorithm's overview</figcaption>
+</figure>
+    </div>
         <h2>Jensen-Shannon Divergence</h2>
 
         <p>The script utilizes Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed variant of the Kullback-Leibler (KL) divergence, which measures the dissimilarity between two probability distributions.</p>

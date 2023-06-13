@@ -59,10 +59,10 @@
     <div>
 <figure style="text-align: center;">
     <img src="algo.png" alt="Algorithm's overview" style="max-width: 100%;">
-    <figcaption>Algorithm's overview</figcaption>
+    <figcaption>Algorithm's overview*</figcaption>
 </figure>
     </div>
-        <h2>Jensen-Shannon Divergence</h2>
+        <h2>Jensen-Shannon Divergence**</h2>
 
         <p>The script utilizes Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed variant of the Kullback-Leibler (KL) divergence, which measures the dissimilarity between two probability distributions.</p>
 
@@ -72,7 +72,7 @@
 
         <p>Langevin dynamics is a mathematical framework employed to model particle movement in a fluid. It is predicated on adding random noise to particle motion to simulate thermal fluctuations' effects.</p>
 
-        <p>In this script, Langevin dynamics is used to add noise to images during the evaluation process. This enables the optimization algorithm to explore different solution space regions and avoid getting trapped in local minima. The noise is added at multiple levels using an annealing schedule that gradually reduces noise as optimization progresses.</p>
+        <p>In this script, Langevin dynamics is used to add noise to images during the evaluation process. This enables the optimization algorithm to explore different solution space regions and avoid getting trapped in local minima. The noise is added at multiple levels using an annealing schedule that gradually reduces noise as optimization progresses queried from the Langevin dynamical schedule.</p>
 
         <h2>Usage</h2>
 
@@ -88,7 +88,7 @@
             <li>Pascanu, R., & Bengio, Y. (2014). Revisiting natural gradient for deep networks. arXiv preprint arXiv:1301.3584.</li>
             <li>Lin, J. (1991). Divergence measures based on the Shannon entropy. IEEE Transactions on Information Theory, 37(1), 145-151.</li>
         </ol>
-        
+        *Langevin annealing images is from Yang Song's <a href="https://yang-song.net/blog/2021/score/">blog</a>. **Explanation of JS Diveregence is from Lillian Weng's <a href="https://arxiv.org/pdf/1904.08994.pdf">paper</a>. 
         <section>
     <h2>Cite this page</h2>
     <p>To cite this work, you can use the following format:</p>

@@ -97,10 +97,10 @@ def keep_diverse_images(path, P):
     for i in range(n):
         if i not in sdi_sorted[:keep]:
             os.remove(dataset.imgs[i][0])
-
+'''
+# I am trying something new. Don't bother right now.
 source_path = '/src'
 dest_path = '/dstr'
-'''
 k = 100
 evals = 50
 batch = 50

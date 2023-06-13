@@ -1,4 +1,4 @@
-# Image Randomiser: A Method to Optimize Samples by Downsampling and Langevin Annealing using JS Divergence.
+# Image Randomiser: A Method to Optimize Samples by Langevin Annealing using JS Divergence
 
 # Description
 

@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+# Code by 1ssb
+
 import os
 import shutil
 import numpy as np

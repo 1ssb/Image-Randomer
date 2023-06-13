@@ -57,7 +57,7 @@
 
 <p>We then define a class called ImageDataset which inherits from the Dataset class in PyTorch. This class takes in a root_dir argument during initialization and stores it as an instance variable. We also create an instance variable called image_paths which is a list of all image file paths in the root_dir that end with .png, .jpg, or .jpeg. The class also has two methods: __len__ and __getitem__. The __len__ method returns the number of image paths in the dataset while the __getitem__ method takes in an index and returns the image at that index after converting it to RGB and transforming it into a tensor.</p>
 
-<p>We then define two functions: select_diverse_images and copy_diverse_images. The first function takes in a source distribution, a value for k, and a batch size. It returns the best subset of images from the source distribution based on their Jensen-Shannon divergence. The second function takes in a source path, destination path, value for k, number of evaluations, and batch size. It creates an instance of the ImageDataset class using the source path and creates a DataLoader from it. It then computes the source distribution by flattening each image in the dataset and concatenating them. Next, it selects the best subset of images from the source distribution using the previously defined function and copies those images to the destination path.</p>
+<p>We then define two functions: select_diverse_images and copy_diverse_images. The first function takes in a source distribution, a value for k, and a batch size. It returns the best subset of images from the source distribution based on their Jensen-Shannon divergence of the random sample and source, iterated over batches. The second function takes in a source path, destination path, value for k, number of evaluations, and batch size. It creates an instance of the ImageDataset class using the source path and creates a DataLoader from it. It then computes the source distribution by flattening each image in the dataset and concatenating them. Next, it selects the best subset of images from the source distribution using the previously defined function and copies those images to the destination path.</p>
   </div>
     <div>
 <figure style="text-align: center;">
@@ -72,12 +72,9 @@
 
         <p>The rationale for using JS divergence is that it is a bounded measure of similarity; its value always lies between 0 and 1. This makes it easier to interpret and compare results. Additionally, unlike KL divergence, JS divergence is symmetric; it yields the same result irrespective of the order in which the two distributions are compared.</p>
 
-        <h3>Langevin Dynamics</h3>
-
-        <p>Langevin dynamics is a mathematical framework employed to model particle movement in a fluid. It is predicated on adding random noise to particle motion to simulate thermal fluctuations' effects.</p>
-
-        <p>In this script, Langevin dynamics is used to add noise to images during the evaluation process. This enables the optimization algorithm to explore different solution space regions and avoid getting trapped in local minima. The noise is added at multiple levels using an annealing schedule that gradually reduces noise as optimization progresses queried from the Langevin dynamical schedule.</p>
-
+        <h3>Langevin Annealing</h3>
+        <p>Langevin annealing is a method that uses Langevin dynamics to optimize a non-convex potential function. It is based on the idea of adding random noise to the motion of particles to simulate the effects of thermal fluctuations. This allows the optimization algorithm to explore different regions of the solution space and avoid getting stuck in local minima. The noise is added at multiple levels using an annealing schedule, which gradually reduces the amount of noise as the optimization progresses.</p>
+        
         <h2>Usage</h2>
 
         <p>At the bottom of the script, we define some variables for the source path, destination path, value for k (number of samples), number of evaluations, and batch size for the divergence calculation. We then call the copy_diverse_images function with these arguments to execute the code. Make sure you use the correct paths and the desired parameters, also you could explore changing the hyperparameter of the Langevin annealing.</p>

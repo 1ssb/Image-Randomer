@@ -15,6 +15,7 @@ print("All Libraries imported!")
 
 if not torch.cuda.is_available():
     raise Exception('GPU is not available')
+
 device = torch.device('cuda')
 
 class ImageDataset(Dataset):
@@ -29,7 +30,7 @@ class ImageDataset(Dataset):
         image_path = self.image_paths[idx]
         image = Image.open(image_path).convert('RGB')
         image = transforms.ToTensor()(image)
-        return image
+        return image.to(device)
 
 def select_diverse_images(source_distribution, k, batch):
     n = len(source_distribution)
@@ -49,30 +50,40 @@ def select_diverse_images(source_distribution, k, batch):
         if js_divergence < best_js_divergence:
             best_js_divergence = js_divergence
             best_subset = subset
-    return best_subset
+
+    if best_subset is None:
+        return torch.randperm(n)[:int(k)]
+    else:
+        return best_subset
 
 def copy_diverse_images(source_path, dest_path, k, evals, batch):
     dataset = ImageDataset(source_path)
     dataloader = DataLoader(dataset, batch_size=1)
     source_distribution = []
     image_paths = dataset.image_paths
+
     for image in tqdm(dataloader):
         image_array = image.flatten()
         source_distribution.append(image_array)
-    source_distribution = torch.cat(source_distribution)
+
+    source_distribution = torch.cat(source_distribution).to(device)
+
     best_images = []
     for i in tqdm(range(evals)):
         dt = 0.1
         gamma = 1.0
         kT = 1.0 + i*dt
+
         source_distribution += -gamma * source_distribution * dt + np.sqrt(2 * gamma * kT * dt) * torch.randn_like(source_distribution)
+
         best_subset = select_diverse_images(source_distribution, k, batch)
         best_images.extend(best_subset.tolist())
+
     for i in best_images:
         shutil.copy(image_paths[i], dest_path)
 
-source_path = 'src'
-dest_path = 'dst'
+source_path = '/src'
+dest_path = '/dst'
 k = 100
 evals = 50
 batch = 50

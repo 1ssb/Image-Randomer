@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-
-# Code by 1ssb: https://github.com/1ssb/Image-Randomizer
-
 import os
 import shutil
 import numpy as np
@@ -36,8 +32,16 @@ def select_diverse_images(source_distribution, k, batch):
     best_js_divergence = float('inf')
     best_subset = None
     for b in range(batch):
-        subset = torch.randperm(n)[:k]
+        subset = torch.randperm(n)[:int(k)]
         sample_distribution = source_distribution[subset]
+        
+        # Pad with zeros
+        max_len = source_distribution.shape[0]
+        pad_len = max_len - sample_distribution.shape[0]
+        sample_distribution = torch.cat([sample_distribution, torch.zeros((sample_distribution.shape[0], pad_len))], dim=1)
+        pad_len = max_len - source_distribution.shape[1]
+        source_distribution = torch.cat([source_distribution, torch.zeros((source_distribution.shape[0], pad_len))], dim=1)
+        
         m = 0.5 * (sample_distribution + source_distribution)
         js_divergence = 0.5 * torch.sum(sample_distribution * torch.log(sample_distribution / m) + source_distribution * torch.log(source_distribution / m))
         if js_divergence < best_js_divergence:
@@ -69,10 +73,38 @@ def copy_diverse_images(source_path, dest_path, k, eval, batch):
         
     for i in best_images:
         shutil.copy(image_paths[i], dest_path)
+'''       
+def keep_diverse_images(path, P):
+    if P >= 1 or P <= 0:
+        raise ValueError("P must be less than one and greater than zero")
+    
+    # Load images
+    transform = transforms.Compose([transforms.ToTensor()])
+    dataset = datasets.ImageFolder(path, transform=transform)
+    dataloader = DataLoader(dataset, batch_size=len(dataset))
+    
+    # Simpson's Diversity Index
+    data = next(iter(dataloader))[0]
+    n = len(data)
+    sdi = []
+    for i in tqdm(range(n), desc="Pruning to keep the most diverse set of images"):
+        image = data[i]
+        p = image / image.sum()
+        sdi.append((1 - (p ** 2).sum()).item())
+        
+    sdi_sorted = sorted(range(n), key=lambda k: sdi[k], reverse=True)
+    keep = int(n * P)
+    for i in range(n):
+        if i not in sdi_sorted[:keep]:
+            os.remove(dataset.imgs[i][0])
 
-source_path = '/path/to/source/images'
-dest_path = '/path/to/destination/folder'
-k = 10
+source_path = '/src'
+dest_path = '/dstr'
+'''
+k = 100
 evals = 50
 batch = 50
+# P = 0.5
+# tot = k/P 
 copy_diverse_images(source_path, dest_path, k, evals, batch)
+# keep_diverse_images(dest_path, P)

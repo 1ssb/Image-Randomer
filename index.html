@@ -9,7 +9,7 @@
     <html lang='en-gb'>
     <style>
         body {
-            background-color: #F5F5DC;
+            background-color: white;
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
         }
@@ -32,7 +32,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: #333;
+            background-color: black;
             text-align: center;
             line-height: 40px;
             color: white;
@@ -51,7 +51,15 @@
 
         <p>Python Code: <a href="https://github.com/1ssb/Image-Randomiser/blob/main/code.py">https://github.com/1ssb/Image-Randomiser/blob/main/code.py</a></p>
 
-    <h2>Indepth Description</h2>
+        <h2>Overview</h2>
+        <div>
+        <p>This is an image sampling algorithm that samples a subset of images to optimize sample diversity by minimising the JS divergence between sample distributiuon and source distribution. We employ PyTorch to implement the image processing pipeline and can utilize graphical processing for acceleration if available.</p>
+
+        <p>The core problem this code is solving is to select the most diverse images from a dataset using JS divergence loss function after annealing the distributions generated in the samples and the source. It adds noise to the images during the evaluation process using Langevin dynamics schedule to explore different solution space regions and avoid getting trapped in local minima.</p>
+        
+        </div>
+        
+        <h2>Commentry</h2>
         <div>
         <p>In this code, we are importing necessary libraries such as os, shutil, numpy, PIL, torch, torchvision, and tqdm. After importing the libraries, we check if a GPU is available and if not, raise an exception. If a GPU is available, we set the device to cuda.</p>
 
@@ -68,10 +76,12 @@
         <h2>Background</h2>
         <h3>Jensen-Shannon Divergence</h3>
 
-        <p>The script utilizes Jensen-Shannon (JS) divergence as a measure of similarity between two probability distributions. The JS divergence is a symmetrized and smoothed variant of the Kullback-Leibler (KL) divergence, which measures the dissimilarity between two probability distributions.</p>
-
-        <p>The rationale for using JS divergence is that it is a bounded measure of similarity; its value always lies between 0 and 1. This makes it easier to interpret and compare results. Additionally, unlike KL divergence, JS divergence is symmetric; it yields the same result irrespective of the order in which the two distributions are compared.</p>
-
+        <p>The advantage of JS divergence over KL divergence is mostly related to issues with empty probabilities for certain events or bins and how these cause issues with Kullback-Leibler divergence (KL Divergence) and population stability index (PSI). JS divergence uses a mixture probability as a baseline when comparing two distributions. In the discrete versions of PSI and KL divergence, the equations blow up when there are 0 probability events.</p>
+    <p>JS-divergence is an improved version of KL-divergence with symmetric measures and normalized outcomes. The normalization provides better stability during the loss function optimization.</p>
+    <p>The equation for JS-divergence between two distributions g and h can be defined as:</p>
+    <p style="font-family:serif;">JS(g,h) = 0.5 * KL(g:(g+h)/2) + 0.5 * KL(h:(g+h)/2)</p>
+    <p>where KL represents Kullback-Leibler divergence. From this equation, we can say that JS-divergence computes a symmetrical measure. If we use base-2 logarithm then this measure is a normalized version of KL divergence, with scores between 0 (same) and 1 (completely different).</p> 
+        
         <h3>Langevin Annealing</h3>
         <p>Langevin annealing is a method that uses Langevin dynamics to optimize a non-convex potential function. It is based on the idea of adding random noise to the motion of particles to simulate the effects of thermal fluctuations. This allows the optimization algorithm to explore different regions of the solution space and avoid getting stuck in local minima. The noise is added at multiple levels using an annealing schedule, which gradually reduces the amount of noise as the optimization progresses.</p>
         

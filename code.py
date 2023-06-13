@@ -49,7 +49,9 @@ def process_images(source_path, destination_path, sample_size):
 # Prepare the list for saving the optimal image metadata (name)
     dataloader = DataLoader(dataset, batch_size=1)
     os.makedirs(destination_path, exist_ok=True)
-    optimal_image_names = []
+# Initialize a list to store the optimal image names
+optimal_image_names = []
+
 # Iterate over images in the dataloader
 for i, image in enumerate(tqdm(dataloader)):
     # Move the image to the device (e.g., GPU)
@@ -63,7 +65,6 @@ for i, image in enumerate(tqdm(dataloader)):
     # Create an optimizer using the AdamW algorithm with the sample distribution as its parameter
     optimizer = torch.optim.AdamW([sample_distribution], lr=0.1)
 
-    
     # Set the initial temperature and friction coefficient
     kT = 1.0
     gamma = 0.1
@@ -85,7 +86,7 @@ for i, image in enumerate(tqdm(dataloader)):
         # Reset gradients to zero by calling the optimizer's zero_grad method
         optimizer.zero_grad()
         # Update the temperature using an annealing schedule: this is a control parameter.
-        kT *= 0.99
+        kT *= 0.95
 
     # Append the name of the optimal image to a list of optimal image names using its index in the dataset
     optimal_image_names.append(dataset.image_paths[i])

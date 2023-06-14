@@ -8,6 +8,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 import numpy as np
+
 if not torch.cuda.is_available():
     raise Exception('GPU is not available')
 device = torch.device('cuda')
@@ -22,6 +23,7 @@ class ImageDataset(Dataset):
     def __getitem__(self, idx):
         image_path = self.image_paths[idx]
         image = Image.open(image_path).convert('RGB')
+        image = transforms.Resize((32, 32))(image)
         image = transforms.ToTensor()(image)
         return image.to(device)
     
@@ -50,7 +52,7 @@ def select_diverse_images(source_distribution, k, batch):
 
 def copy_diverse_images(source_path, dest_path, k, evals, batch):
     dataset = ImageDataset(source_path)
-    dataloader = DataLoader(dataset, batch_size=1)
+    dataloader = DataLoader(dataset, batch_size=16, num_workers=4)
     source_distribution = []
     image_paths = dataset.image_paths
     for image in tqdm(dataloader, desc='Loading images'):
@@ -63,14 +65,15 @@ def copy_diverse_images(source_path, dest_path, k, evals, batch):
         gamma = 1.0
         kT = 1.0 + i*dt
         source_distribution += -gamma * source_distribution * dt + np.sqrt(2 * gamma * kT * dt) * torch.randn_like(source_distribution)
-        best_subset = select_diverse_images(source_distribution, k, batch)
+        best_subset = select_diverse_images(source_distribution, k, batch * 4)
         best_images.extend(best_subset.tolist())
     for i in tqdm(best_images, desc='Copying images'):
         shutil.copy(image_paths[i], dest_path)
-        
+
 source_path = '/src'
 dest_path = '/dst'
 k = 100
 evals = 50
 batch = 50
+
 copy_diverse_images(source_path, dest_path, k, evals, batch)

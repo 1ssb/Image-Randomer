@@ -58,8 +58,8 @@ if __name__ == '__main__':
     device = torch.device('cuda')
     print("All Libraries Imported, GPU in use!")
     
-    source_path = '/home/projects/Rudra_Generative_Robotics/Project_Data/project_test'
-    dest_path = '/home/projects/Rudra_Generative_Robotics/Project_Data/Sampler'
+    source_path = '/src'
+    dest_path = '/dst'
     k = 2
     evals = 1
     batch = 1

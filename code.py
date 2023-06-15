@@ -21,11 +21,7 @@ except ImportError:
     subprocess.check_call(["python3", '-m', 'pip', 'install', 'Pillow', 'torch', 'torchvision', 'tqdm'])
 
 def select_diverse_images(source_distribution, k, batch):
-    """
-    This function selects a subset of k images from the source_distribution that are most diverse.
-    It does this by computing the Jensen-Shannon divergence between the sample_distribution and the source_distribution.
-    The function returns the indices of the k most diverse images in the source_distribution.
-    """
+    
     # Get the number of images in the source_distribution
     n = len(source_distribution)
     
@@ -116,7 +112,7 @@ def copy_diverse_images(source_path, dest_path, k, evals, batch):
     for i in tqdm(best_images, desc='Copying images'):
         # Copy the selected image from the src directory to the dst directory without modifying it
         shutil.copy(image_paths[i], dst)
-
+        
 if __name__ == '__main__':
     if not torch.cuda.is_available():
         raise Exception('GPU is not available')
@@ -127,8 +123,8 @@ if __name__ == '__main__':
     print("All Libraries Imported, GPU in use!")
     
     # Set src and dst placeholders for source and destination paths
-    src = '/src'
-    dst = '/dst'
+    source_path = '/src'
+    dest_path = '/dst'
     
     # Assign parameters
     k = 2
